@@ -33,9 +33,13 @@ namespace Traveler
 
         static void HandlePlan(TravelRequest request)
         {
-            if (!request.IsValid())
+            var result = request.Validate();
+            if (!result.IsValid)
             {
-                Console.WriteLine("Invalid travel request. Please provide at least --from, --to, --budget, and --days.");
+                Console.WriteLine("Invalid travel request:");
+                foreach (var error in result.Errors)
+                    Console.WriteLine($"  ✗ {error}");
+                Console.WriteLine("\nRun 'traveler help' for usage information.");
                 return;
             }
 

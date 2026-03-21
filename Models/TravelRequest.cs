@@ -1,3 +1,7 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
 namespace Traveler.Models
 {
     public class TravelRequest
@@ -6,21 +10,62 @@ namespace Traveler.Models
         public string Destination { get; set; } = string.Empty;
         public decimal Budget { get; set; }
         public int Passengers { get; set; } = 1;
-        public DateTime StartDate { get; set; }
+        public DateTime? StartDate { get; set; }
         public int DurationDays { get; set; }
+        public List<string> Preferences { get; set; } = new List<string>();
+        public string Via { get; set; } = string.Empty;
 
-        public bool IsValid()
+        /// <summary>
+        /// Validates all fields and returns a <see cref="ValidationResult"/> with
+        /// every rule violation listed, so the user can fix everything in one go.
+        /// </summary>
+        public ValidationResult Validate()
         {
-            return !string.IsNullOrWhiteSpace(Origin) && 
-                   !string.IsNullOrWhiteSpace(Destination) && 
-                   Budget > 0 && 
-                   Passengers > 0 && 
-                   DurationDays > 0;
+            var errors = new List<string>();
+
+            if (string.IsNullOrWhiteSpace(Origin))
+                errors.Add("Origin (--from) is required.");
+
+            if (string.IsNullOrWhiteSpace(Destination))
+                errors.Add("Destination (--to) is required.");
+
+            if (!string.IsNullOrWhiteSpace(Origin) &&
+                !string.IsNullOrWhiteSpace(Destination) &&
+                string.Equals(Origin.Trim(), Destination.Trim(), StringComparison.OrdinalIgnoreCase))
+                errors.Add("Origin and Destination must differ.");
+
+            if (Budget <= 0)
+                errors.Add("Budget (--budget) must be greater than 0.");
+            else if (Budget > 1_000_000)
+                errors.Add("Budget (--budget) must be 1,000,000 or less.");
+
+            if (Passengers < 1)
+                errors.Add("Passengers (--passengers) must be at least 1.");
+            else if (Passengers > 20)
+                errors.Add("Passengers (--passengers) must be 20 or fewer.");
+
+            if (DurationDays < 1)
+                errors.Add("Duration (--days) must be at least 1 day.");
+            else if (DurationDays > 365)
+                errors.Add("Duration (--days) must be 365 days or fewer.");
+
+            if (StartDate.HasValue && StartDate.Value.Date < DateTime.Today)
+                errors.Add($"Start date must not be in the past (got {StartDate.Value:yyyy-MM-dd}).");
+
+            return errors.Count == 0
+                ? ValidationResult.Ok()
+                : ValidationResult.Fail(errors);
         }
 
         public override string ToString()
         {
-            return $"Travel from {Origin} to {Destination} | Budget: ${Budget} | Passengers: {Passengers} | Duration: {DurationDays} days";
+            var sb = new System.Text.StringBuilder();
+            sb.Append($"Travel from {Origin} to {Destination}");
+            if (!string.IsNullOrWhiteSpace(Via)) sb.Append($" via {Via}");
+            sb.Append($" | Budget: ${Budget:N2} | Passengers: {Passengers} | Duration: {DurationDays} day(s)");
+            if (StartDate.HasValue) sb.Append($" | Departs: {StartDate.Value:yyyy-MM-dd}");
+            if (Preferences.Count > 0) sb.Append($" | Preferences: {string.Join(", ", Preferences)}");
+            return sb.ToString();
         }
     }
 }

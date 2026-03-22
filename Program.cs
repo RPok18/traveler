@@ -1,4 +1,6 @@
 using System;
+using System.Linq;
+using Traveler.Logic;
 using Traveler.Models;
 
 namespace Traveler
@@ -45,7 +47,21 @@ namespace Traveler
 
             Console.WriteLine("Planning your itinerary...");
             Console.WriteLine(request.ToString());
-            Console.WriteLine("\nDijkstra pathfinding coming in Day 3-4!");
+            
+            var planner = new ItineraryPlanner();
+            var itinerary = planner.Plan(request.Origin, request.Destination, request.Via);
+
+            if (itinerary.Found)
+            {
+                Console.WriteLine(itinerary.ToString());
+                Console.WriteLine("Done! (Next: Optimized budgeting in Day 5-6)");
+            }
+            else
+            {
+                Console.WriteLine("\n[Error] Unable to find a route for this journey.");
+                var known = planner.GetKnownCities();
+                Console.WriteLine($"Known hubs: {string.Join(", ", known)}");
+            }
         }
     }
 }

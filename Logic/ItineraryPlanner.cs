@@ -11,51 +11,63 @@ namespace Traveler.Logic
 
         public ItineraryPlanner()
         {
-            // Initial common connections (flight hours)
-            AddBidirectional("JFK", "LHR", 7.0);
-            AddBidirectional("JFK", "CDG", 7.5);
-            AddBidirectional("LHR", "CDG", 1.5, "Train");
-            AddBidirectional("CDG", "FCO", 2.0);
-            AddBidirectional("FCO", "BER", 2.0);
-            AddBidirectional("BER", "LHR", 1.5);
-            AddBidirectional("LHR", "HND", 12.0);
-            AddBidirectional("HND", "SYD", 9.5);
-            AddBidirectional("SYD", "JFK", 20.0);
-            AddBidirectional("CDG", "HND", 12.5);
-            AddBidirectional("JFK", "LAX", 6.0);
-            AddBidirectional("LAX", "HND", 10.5);
-            AddBidirectional("LAX", "SYD", 14.0);
+            // Initial common connections (flight hours, price)
+            AddBidirectional("JFK", "LHR", 7.0, 450m);
+            AddBidirectional("JFK", "CDG", 7.5, 480m);
+            AddBidirectional("LHR", "CDG", 1.5, 80m, "Train");
+            AddBidirectional("CDG", "FCO", 2.0, 120m);
+            AddBidirectional("FCO", "BER", 2.0, 110m);
+            AddBidirectional("BER", "LHR", 1.5, 90m);
+            AddBidirectional("LHR", "HND", 12.0, 800m);
+            AddBidirectional("HND", "SYD", 9.5, 650m);
+            AddBidirectional("SYD", "JFK", 18.0, 1200m); // Fastest
+            AddBidirectional("CDG", "HND", 12.5, 820m);
+            AddBidirectional("JFK", "LAX", 6.0, 300m);
+            AddBidirectional("LAX", "HND", 10.5, 700m);
+            AddBidirectional("LAX", "SYD", 14.0, 800m); // Cheapest via LAX (1100)
         }
 
-        private void AddBidirectional(string city1, string city2, double cost, string mode = "Flight")
+        private void AddBidirectional(string city1, string city2, double cost, decimal price = 0m, string mode = "Flight")
         {
-            _connections.Add(new CityConnection(city1, city2, cost, mode));
-            _connections.Add(new CityConnection(city2, city1, cost, mode));
+            _connections.Add(new CityConnection(city1, city2, cost, price, mode));
+            _connections.Add(new CityConnection(city2, city1, cost, price, mode));
         }
 
-        public Itinerary Plan(string origin, string destination, string via = "")
+        public Itinerary Plan(string origin, string destination, string via = "", OptimizationGoal goal = OptimizationGoal.Fastest, decimal maxBudget = 0m)
         {
+            Itinerary result;
             if (string.IsNullOrWhiteSpace(via))
             {
-                return FindShortestPath(origin, destination);
+                result = FindShortestPath(origin, destination, goal);
             }
-
-            // If via is provided, plan A -> Via and then Via -> Destination
-            var firstHalf = FindShortestPath(origin, via);
-            var secondHalf = FindShortestPath(via, destination);
-
-            if (!firstHalf.Found || !secondHalf.Found)
+            else
             {
-                return new Itinerary(); // Found nothing or one leg failed.
+                // If via is provided, plan A -> Via and then Via -> Destination
+                var firstHalf = FindShortestPath(origin, via, goal);
+                var secondHalf = FindShortestPath(via, destination, goal);
+
+                if (!firstHalf.Found || !secondHalf.Found)
+                {
+                    result = new Itinerary(); // Found nothing or one leg failed.
+                }
+                else
+                {
+                    result = new Itinerary();
+                    result.Segments.AddRange(firstHalf.Segments);
+                    result.Segments.AddRange(secondHalf.Segments);
+                }
             }
 
-            var fullItinerary = new Itinerary();
-            fullItinerary.Segments.AddRange(firstHalf.Segments);
-            fullItinerary.Segments.AddRange(secondHalf.Segments);
-            return fullItinerary;
+            // Budget filter
+            if (result.Found && maxBudget > 0 && result.TotalPrice > maxBudget)
+            {
+                return new Itinerary(); // Exceeds budget
+            }
+
+            return result;
         }
 
-        private Itinerary FindShortestPath(string startCity, string endCity)
+        private Itinerary FindShortestPath(string startCity, string endCity, OptimizationGoal goal)
         {
             var distances = new Dictionary<string, double>(StringComparer.OrdinalIgnoreCase);
             var previous = new Dictionary<string, CityConnection>(StringComparer.OrdinalIgnoreCase);
@@ -86,7 +98,8 @@ namespace Traveler.Logic
                 var neighbors = _connections.Where(c => string.Equals(c.From, current, StringComparison.OrdinalIgnoreCase));
                 foreach (var edge in neighbors)
                 {
-                    double alt = distances[current] + edge.Cost;
+                    double weight = goal == OptimizationGoal.Fastest ? edge.Cost : (double)edge.Price;
+                    double alt = distances[current] + weight;
                     if (alt < distances[edge.To])
                     {
                         distances[edge.To] = alt;

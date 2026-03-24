@@ -32,6 +32,27 @@ namespace Traveler
                             decimal.TryParse(args[++i], NumberStyles.Any, CultureInfo.InvariantCulture, out decimal budget))
                             request.Budget = budget;
                         break;
+                    
+                    case "--max-budget":
+                        if (i + 1 < args.Length &&
+                            decimal.TryParse(args[++i], NumberStyles.Any, CultureInfo.InvariantCulture, out decimal maxBudget))
+                            request.MaxBudget = maxBudget;
+                        break;
+                    
+                    case "--goal":
+                        if (i + 1 < args.Length)
+                        {
+                            var g = args[++i];
+                            if (Enum.TryParse<OptimizationGoal>(g, true, out var goal))
+                            {
+                                request.OptimizationGoal = goal;
+                            }
+                            else
+                            {
+                                Console.WriteLine($"Warning: could not parse --goal '{g}'. Using 'Fastest'.");
+                            }
+                        }
+                        break;
 
                     case "--passengers":
                         if (i + 1 < args.Length && int.TryParse(args[++i], out int passengers))
@@ -83,6 +104,8 @@ namespace Traveler
             Console.WriteLine("  --from <city>              Origin city                 (required)");
             Console.WriteLine("  --to <city>                Destination city            (required)");
             Console.WriteLine("  --budget <amount>          Total budget in USD         (required)");
+            Console.WriteLine("  --max-budget <amount>      Maximum acceptable budget   (optional, Day 5-6)");
+            Console.WriteLine("  --goal <Fastest|Cheapest>  Optimization priority       (optional, default: Fastest)");
             Console.WriteLine("  --days <n>                 Duration of trip (1-365)    (required)");
             Console.WriteLine("  --passengers <n>           Number of travelers (1-20)  (default: 1)");
             Console.WriteLine("  --date <yyyy-MM-dd>        Departure date              (optional)");

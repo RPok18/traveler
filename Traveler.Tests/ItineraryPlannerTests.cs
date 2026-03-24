@@ -53,5 +53,34 @@ namespace Traveler.Tests
 
             Assert.That(itinerary.Found, Is.False);
         }
+
+        [Test]
+        public void Path_ExceedingBudget_ShouldReturnNotFound()
+        {
+            var planner = new ItineraryPlanner();
+            // JFK -> LHR base price is $450
+            var itinerary = planner.Plan("JFK", "LHR", maxBudget: 400m);
+            Assert.That(itinerary.Found, Is.False);
+        }
+
+        [Test]
+        public void Path_Cheapest_ShouldPrioritizePriceOverTime()
+        {
+            var planner = new ItineraryPlanner();
+            // JFK -> SYD:
+            // Fastest: Direct 18h, $1200
+            // Cheapest: via LAX 20h, $1100 (JFK->LAX $300 + LAX->SYD $800)
+            
+            var fastest = planner.Plan("JFK", "SYD", goal: OptimizationGoal.Fastest);
+            Assert.That(fastest.TotalCost, Is.EqualTo(18.0));
+            Assert.That(fastest.TotalPrice, Is.EqualTo(1200m));
+            Assert.That(fastest.Segments.Count, Is.EqualTo(1));
+
+            var cheapest = planner.Plan("JFK", "SYD", goal: OptimizationGoal.Cheapest);
+            Assert.That(cheapest.TotalPrice, Is.EqualTo(1100m));
+            Assert.That(cheapest.TotalCost, Is.EqualTo(20.0));
+            Assert.That(cheapest.Segments.Count, Is.EqualTo(2));
+            Assert.That(cheapest.Segments.Any(s => s.To == "LAX" || s.From == "LAX"), Is.True);
+        }
     }
 }

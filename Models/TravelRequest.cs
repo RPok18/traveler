@@ -4,6 +4,8 @@ using System.Linq;
 
 namespace Traveler.Models
 {
+    public enum OptimizationGoal { Fastest, Cheapest }
+
     public class TravelRequest
     {
         public string Origin { get; set; } = string.Empty;
@@ -14,6 +16,9 @@ namespace Traveler.Models
         public int DurationDays { get; set; }
         public List<string> Preferences { get; set; } = new List<string>();
         public string Via { get; set; } = string.Empty;
+        
+        public decimal MaxBudget { get; set; } // Upper limit for trip budget
+        public OptimizationGoal OptimizationGoal { get; set; } = OptimizationGoal.Fastest;
 
         /// <summary>
         /// Validates all fields and returns a <see cref="ValidationResult"/> with
@@ -39,6 +44,11 @@ namespace Traveler.Models
             else if (Budget > 1_000_000)
                 errors.Add("Budget (--budget) must be 1,000,000 or less.");
 
+            if (MaxBudget < 0)
+                errors.Add("Max Budget must be 0 or greater.");
+            else if (MaxBudget > 1_000_000)
+                errors.Add("Max Budget must be 1,000,000 or less.");
+
             if (Passengers < 1)
                 errors.Add("Passengers (--passengers) must be at least 1.");
             else if (Passengers > 20)
@@ -62,7 +72,9 @@ namespace Traveler.Models
             var sb = new System.Text.StringBuilder();
             sb.Append($"Travel from {Origin} to {Destination}");
             if (!string.IsNullOrWhiteSpace(Via)) sb.Append($" via {Via}");
-            sb.Append($" | Budget: ${Budget:N2} | Passengers: {Passengers} | Duration: {DurationDays} day(s)");
+            sb.Append($" | Budget: ${Budget:N2}");
+            if (MaxBudget > 0) sb.Append($" (Max: ${MaxBudget:N2})");
+            sb.Append($" | Passengers: {Passengers} | Duration: {DurationDays} day(s) | Opt Goal: {OptimizationGoal}");
             if (StartDate.HasValue) sb.Append($" | Departs: {StartDate.Value:yyyy-MM-dd}");
             if (Preferences.Count > 0) sb.Append($" | Preferences: {string.Join(", ", Preferences)}");
             return sb.ToString();

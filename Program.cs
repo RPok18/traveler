@@ -49,16 +49,15 @@ namespace Traveler
             Console.WriteLine(request.ToString());
             
             var planner = new ItineraryPlanner();
-            var itinerary = planner.Plan(request.Origin, request.Destination, request.Via);
+            var itinerary = planner.Plan(request.Origin, request.Destination, request.Via, request.OptimizationGoal, request.MaxBudget);
 
             if (itinerary.Found)
             {
                 Console.WriteLine(itinerary.ToString());
-                Console.WriteLine("Done! (Next: Optimized budgeting in Day 5-6)");
             }
             else
             {
-                Console.WriteLine("\n[Error] Unable to find a route for this journey.");
+                Console.WriteLine("\n[Error] Unable to find a route for this journey (might be out of budget).");
                 var known = planner.GetKnownCities();
                 Console.WriteLine($"Known hubs: {string.Join(", ", known)}");
             }

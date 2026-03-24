@@ -8,6 +8,7 @@ namespace Traveler.Models
     {
         public List<CityConnection> Segments { get; set; } = new List<CityConnection>();
         public double TotalCost => Segments.Sum(s => s.Cost);
+        public decimal TotalPrice => Segments.Sum(s => s.Price);
         public bool Found => Segments.Count > 0;
 
         public string Origin => Segments.FirstOrDefault()?.From ?? string.Empty;
@@ -18,10 +19,10 @@ namespace Traveler.Models
             if (!Found) return "No path found.";
 
             var sb = new StringBuilder();
-            sb.AppendLine($"--- Itinerary Found (${TotalCost:N1} total units) ---");
+            sb.AppendLine($"--- Itinerary Found ({TotalCost:N1} hours, ${TotalPrice:N2}) ---");
             foreach (var segment in Segments)
             {
-                sb.AppendLine($"  {segment.From} --[{segment.TransportMode}]--> {segment.To} ({segment.Cost:N1})");
+                sb.AppendLine($"  {segment.From} --[{segment.TransportMode}]--> {segment.To} ({segment.Cost:N1} hrs, ${segment.Price:N2})");
             }
             return sb.ToString();
         }

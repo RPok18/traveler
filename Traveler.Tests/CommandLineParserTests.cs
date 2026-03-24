@@ -64,6 +64,24 @@ namespace Traveler.Tests
         }
 
         [Test]
+        public void Parse_MaxBudget_PopulatesCorrectly()
+        {
+            var args = new[] { "plan", "--from", "A", "--to", "B", "--max-budget", "1500" };
+            var req = CommandLineParser.Parse(args);
+
+            Assert.That(req.MaxBudget, Is.EqualTo(1500m));
+        }
+
+        [Test]
+        public void Parse_Goal_PopulatesCorrectly()
+        {
+            var args = new[] { "plan", "--from", "A", "--to", "B", "--goal", "Cheapest" };
+            var req = CommandLineParser.Parse(args);
+
+            Assert.That(req.OptimizationGoal, Is.EqualTo(OptimizationGoal.Cheapest));
+        }
+
+        [Test]
         public void Parse_MissingOptionalArgs_DoesNotThrow()
         {
             var args = new[] { "plan", "--from", "X", "--to", "Y" };

@@ -4,8 +4,8 @@ namespace Traveler.Models
     {
         public string From { get; set; } = string.Empty;
         public string To { get; set; } = string.Empty;
-        public double Cost { get; set; } // Could be distance, or hours.
-        public decimal Price { get; set; } // Monetary cost
+        public double Cost { get; set; }
+        public decimal Price { get; set; } 
         public string TransportMode { get; set; } = "Flight";
 
         public CityConnection(string from, string to, double cost, decimal price = 0m, string mode = "Flight")

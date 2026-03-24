@@ -11,7 +11,7 @@ namespace Traveler.Logic
 
         public ItineraryPlanner()
         {
-            // Initial common connections (flight hours, price)
+            
             AddBidirectional("JFK", "LHR", 7.0, 450m);
             AddBidirectional("JFK", "CDG", 7.5, 480m);
             AddBidirectional("LHR", "CDG", 1.5, 80m, "Train");
@@ -20,11 +20,11 @@ namespace Traveler.Logic
             AddBidirectional("BER", "LHR", 1.5, 90m);
             AddBidirectional("LHR", "HND", 12.0, 800m);
             AddBidirectional("HND", "SYD", 9.5, 650m);
-            AddBidirectional("SYD", "JFK", 18.0, 1200m); // Fastest
+            AddBidirectional("SYD", "JFK", 18.0, 1200m); 
             AddBidirectional("CDG", "HND", 12.5, 820m);
             AddBidirectional("JFK", "LAX", 6.0, 300m);
             AddBidirectional("LAX", "HND", 10.5, 700m);
-            AddBidirectional("LAX", "SYD", 14.0, 800m); // Cheapest via LAX (1100)
+            AddBidirectional("LAX", "SYD", 14.0, 800m); 
         }
 
         private void AddBidirectional(string city1, string city2, double cost, decimal price = 0m, string mode = "Flight")
@@ -42,13 +42,13 @@ namespace Traveler.Logic
             }
             else
             {
-                // If via is provided, plan A -> Via and then Via -> Destination
+               
                 var firstHalf = FindShortestPath(origin, via, goal);
                 var secondHalf = FindShortestPath(via, destination, goal);
 
                 if (!firstHalf.Found || !secondHalf.Found)
                 {
-                    result = new Itinerary(); // Found nothing or one leg failed.
+                    result = new Itinerary(); 
                 }
                 else
                 {

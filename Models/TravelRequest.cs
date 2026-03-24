@@ -20,10 +20,7 @@ namespace Traveler.Models
         public decimal MaxBudget { get; set; } // Upper limit for trip budget
         public OptimizationGoal OptimizationGoal { get; set; } = OptimizationGoal.Fastest;
 
-        /// <summary>
-        /// Validates all fields and returns a <see cref="ValidationResult"/> with
-        /// every rule violation listed, so the user can fix everything in one go.
-        /// </summary>
+        
         public ValidationResult Validate()
         {
             var errors = new List<string>();

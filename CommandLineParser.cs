@@ -84,6 +84,14 @@ namespace Traveler
                             }
                         }
                         break;
+                        
+                    case "--export":
+                        if (i + 1 < args.Length) request.ExportPath = args[++i].Trim();
+                        break;
+
+                    case "--save":
+                        request.SaveToDatabase = true;
+                        break;
                 }
             }
 
@@ -112,6 +120,8 @@ namespace Traveler
             Console.WriteLine("  --via <city>               Waypoint city               (optional, used in Day 3-4)");
             Console.WriteLine("  --preferences <tag,...>    Travel preferences          (optional)");
             Console.WriteLine("                             e.g. beach,culture,food");
+            Console.WriteLine("  --export <path>            Export itinerary to JSON    (optional)");
+            Console.WriteLine("  --save                     Save itinerary to history   (optional)");
         }
     }
 }

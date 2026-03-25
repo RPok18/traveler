@@ -18,6 +18,8 @@ namespace Traveler
             string command = args[0].ToLower();
             var request = CommandLineParser.Parse(args);
 
+            DatabaseHelper.InitializeDatabase();
+
             switch (command)
             {
                 case "plan":
@@ -25,6 +27,9 @@ namespace Traveler
                     break;
                 case "optimize":
                     Console.WriteLine("Optimization logic coming in Day 5-6!");
+                    break;
+                case "history":
+                    DatabaseHelper.GetHistory();
                     break;
                 default:
                     Console.WriteLine($"Unknown command: {command}");
@@ -54,6 +59,16 @@ namespace Traveler
             if (itinerary.Found)
             {
                 Console.WriteLine(itinerary.ToString());
+                
+                if (request.SaveToDatabase)
+                {
+                    DatabaseHelper.SaveItinerary(request, itinerary);
+                }
+                
+                if (!string.IsNullOrWhiteSpace(request.ExportPath))
+                {
+                    JsonExporter.ExportToPath(itinerary, request.ExportPath);
+                }
             }
             else
             {

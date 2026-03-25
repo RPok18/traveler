@@ -20,6 +20,9 @@ namespace Traveler.Models
         public decimal MaxBudget { get; set; } // Upper limit for trip budget
         public OptimizationGoal OptimizationGoal { get; set; } = OptimizationGoal.Fastest;
 
+        public string ExportPath { get; set; } = string.Empty;
+        public bool SaveToDatabase { get; set; } = false;
+
         
         public ValidationResult Validate()
         {

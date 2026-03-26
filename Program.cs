@@ -56,6 +56,11 @@ namespace Traveler
             var planner = new ItineraryPlanner();
             var itinerary = planner.Plan(request.Origin, request.Destination, request.Via, request.OptimizationGoal, request.MaxBudget);
 
+            if (request.EnableRecommendations && itinerary.Found)
+            {
+                AIRecommendationEngine.GenerateRecommendations(request, itinerary);
+            }
+
             if (itinerary.Found)
             {
                 Console.WriteLine(itinerary.ToString());

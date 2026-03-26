@@ -22,6 +22,7 @@ namespace Traveler.Models
 
         public string ExportPath { get; set; } = string.Empty;
         public bool SaveToDatabase { get; set; } = false;
+        public bool EnableRecommendations { get; set; } = false;
 
         
         public ValidationResult Validate()

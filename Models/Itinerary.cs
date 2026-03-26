@@ -10,6 +10,7 @@ namespace Traveler.Models
         public double TotalCost => Segments.Sum(s => s.Cost);
         public decimal TotalPrice => Segments.Sum(s => s.Price);
         public bool Found => Segments.Count > 0;
+        public List<string> Recommendations { get; set; } = new List<string>();
 
         public string Origin => Segments.FirstOrDefault()?.From ?? string.Empty;
         public string Destination => Segments.LastOrDefault()?.To ?? string.Empty;
@@ -24,6 +25,17 @@ namespace Traveler.Models
             {
                 sb.AppendLine($"  {segment.From} --[{segment.TransportMode}]--> {segment.To} ({segment.Cost:N1} hrs, ${segment.Price:N2})");
             }
+            
+            if (Recommendations.Any())
+            {
+                sb.AppendLine();
+                sb.AppendLine("--- AI Recommendations ---");
+                foreach (var rec in Recommendations)
+                {
+                    sb.AppendLine($"  {rec}");
+                }
+            }
+            
             return sb.ToString();
         }
     }

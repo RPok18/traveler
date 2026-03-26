@@ -92,6 +92,10 @@ namespace Traveler
                     case "--save":
                         request.SaveToDatabase = true;
                         break;
+                        
+                    case "--recommend":
+                        request.EnableRecommendations = true;
+                        break;
                 }
             }
 
@@ -122,6 +126,7 @@ namespace Traveler
             Console.WriteLine("                             e.g. beach,culture,food");
             Console.WriteLine("  --export <path>            Export itinerary to JSON    (optional)");
             Console.WriteLine("  --save                     Save itinerary to history   (optional)");
+            Console.WriteLine("  --recommend                Enable AI recommendations   (optional, Day 9-10)");
         }
     }
 }

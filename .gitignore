@@ -4,3 +4,5 @@
 *.userosscache
 *.sln.doccache
 .vs/
+build_output.txt
+*.db

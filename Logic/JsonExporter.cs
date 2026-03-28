@@ -14,7 +14,7 @@ namespace Traveler.Logic
                 var options = new JsonSerializerOptions { WriteIndented = true };
                 string json = JsonSerializer.Serialize(itinerary, options);
 
-                string directory = Path.GetDirectoryName(filePath);
+                string? directory = Path.GetDirectoryName(filePath);
                 if (!string.IsNullOrEmpty(directory))
                 {
                     Directory.CreateDirectory(directory);

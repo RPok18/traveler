@@ -23,10 +23,8 @@ namespace Traveler
             switch (command)
             {
                 case "plan":
-                    HandlePlan(request);
-                    break;
                 case "optimize":
-                    Console.WriteLine("Optimization logic coming in Day 5-6!");
+                    HandlePlan(request);
                     break;
                 case "history":
                     DatabaseHelper.GetHistory();
